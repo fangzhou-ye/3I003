@@ -50,9 +50,9 @@ public class Solution {
 			V = new LinkedHashMap<Integer, Integer>(k);
 			bocaux = new ArrayList<Integer>();
 			String[] arr = in.readLine().split(" ");
-			for(int i=0; i<arr.length; i++) {
-				V.put(Integer.parseInt(arr[i]), 0);
-				bocaux.add(Integer.parseInt(arr[i]));
+			for(String str : arr) {
+				V.put(Integer.parseInt(str), 0);
+				bocaux.add(Integer.parseInt(str));
 			}
 		} catch(FileNotFoundException e) {
 			System.out.println("fichier texte pas trouve");
