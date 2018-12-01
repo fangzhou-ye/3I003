@@ -13,10 +13,12 @@ public class Test {
 		int s = m.getS();
 		ArrayList<Integer> tab = m.getBocaux();
 		
-		int[] resultat = m.searchTime(3, k, tab, s);
+		int[] resultat = m.searchTime(2, k, tab, s);
 		System.out.println("resultat: " + resultat[0]);
 		System.out.println("temps: " + resultat[1] + "ms");
 		System.out.println(m);
+		//m.print_temp();
+		//System.out.println(m.AlgoProgDyn(k, tab, s));
 	}
 
 }
