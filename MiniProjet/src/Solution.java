@@ -4,18 +4,27 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class Solution {
 	
 	private int s;
 	private int k;
+	private int d;
 	private Map<Integer, Integer> V;
 	private ArrayList<Integer> bocaux;
 	// algo 2
 	private LinkedHashMap<Integer[], Integer> temp;
+	
+	public Solution(int numFichier, String folder) throws IOException{
+		init(numFichier, folder);
+	}
 	
 	public void print_temp() {
 		for(Integer[] t : temp.keySet()) {
@@ -23,19 +32,20 @@ public class Solution {
 		}
 	}
 	
-	public Solution(File fichier) throws IOException{
-		init(fichier);
+	public String print_bocaux() {
+		String s = "[ ";
+		for(Integer b : bocaux) {
+			s += b + " ";
+		}
+		s += "]";
+		return s;
 	}
 	
 	public String toString() {
 		String s = "";
 		s += "s:" + this.s + "\n";
 		s += "k:" + this.k + "\n";
-		s += "[ ";
-		for(Integer key : V.keySet()) {
-			s += "(" + key + ":" + V.get(key) + ") ";
-		}
-		return s + "]";
+		return s + print_bocaux();
 	}
 	
 	public int getS() {
@@ -50,22 +60,36 @@ public class Solution {
 		return bocaux;
 	}
 	
-	public void init(File fichier) throws IOException {
+	public void init(int numFichier, String folder) throws IOException {
 		BufferedReader in = null;
 		try {
+			String filePath = new File("").getAbsolutePath() + "/src/" + folder + "/init" + numFichier +".txt";
+			File fichier = new File(filePath);
 			in = new BufferedReader(new FileReader(fichier));
 			s = Integer.parseInt(in.readLine());
 			k = Integer.parseInt(in.readLine());
+			//d = Integer.parseInt(in.readLine());
 			V = new LinkedHashMap<Integer, Integer>(k);
 			temp = new LinkedHashMap<Integer[], Integer>();
+			//init_bocaux(k, d);
+			// lectrue de fichier des valeurs bocaux
+			
 			bocaux = new ArrayList<Integer>();
 			String[] arr = in.readLine().split(" ");
 			for(String str : arr) {
 				V.put(Integer.parseInt(str), 0);
 				bocaux.add(Integer.parseInt(str));
 			}
+			
 		} catch(FileNotFoundException e) {
 			System.out.println("fichier texte pas trouve");
+		}
+	}
+	
+	public void init_bocaux(int k, int d) {
+		bocaux= new ArrayList<Integer>();
+		for(int i=0; i<k; i++) {
+			bocaux.add((int)Math.pow(d, i));
 		}
 	}
 	
@@ -89,7 +113,7 @@ public class Solution {
 		return a;
 	}
 	
-	public int AlgoProgDyn(int k, ArrayList<Integer> tab, int s) {
+	public int AlgoProgDynRec(int k, ArrayList<Integer> tab, int s) {
 		if(s == 0) return 0;
 		if(s<0) return Integer.MAX_VALUE-1;//ne pas deborder la limite de integer;
 		if(k==1) return s;
@@ -100,7 +124,7 @@ public class Solution {
 		if(temp.containsKey(indice_left)) {
 			left = temp.get(indice_left);
 		}else {
-			left = AlgoProgDyn(k-1, tab, s);
+			left = AlgoProgDynRec(k-1, tab, s);
 			temp.put(indice_left, left);
 		}
 		Integer[] indice_right = new Integer[2];
@@ -109,12 +133,34 @@ public class Solution {
 		if(temp.containsKey(indice_right)) {
 			right = temp.get(indice_right);
 		}else {
-			right = AlgoProgDyn(k, tab, s-tab.get(k-1))+1;
+			right = AlgoProgDynRec(k, tab, s-tab.get(k-1))+1;
 			temp.put(indice_right, right);
 		}
-		
-		
 		return min(left, right);
+	}
+	
+	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
+		ArrayList<Integer> opt = new ArrayList<Integer>();
+		opt.add(0, 0);
+		for(int a=1; a<=s; a++) {
+			int j = k-1;
+			while(tab.get(j) > a) {
+				j--;
+			}
+			int min = (a%tab.get(j) == 0) ? a/tab.get(j) : a;
+			int left = 1;
+			int right = a-1;
+			while(left <= right) {
+				int nb1 = opt.get(right);
+				int nb2 = opt.get(left);
+				if(min > nb1+nb2)
+					min = nb1+nb2;
+				left++;
+				right--;
+			}
+			opt.add(a, min);
+		}
+		return opt.get(s);
 	}
 	
 	// supposons que tab est trié par ordre croissant selon le poids
@@ -129,28 +175,62 @@ public class Solution {
 		nb += AlgoGlouton(k-1, tab, reste);
 		return nb;
 	}
+	
+	public boolean TestGloutonCompatible(int k, ArrayList<Integer> bocaux) {
+		if(k >= 3) {
+			for(int s = bocaux.get(2)+2; s<=bocaux.get(k-2)+bocaux.get(k-1)-1; s++) {
+				for(int j=0; j<k; j++) {
+					if(bocaux.get(j) < s && AlgoGlouton(k, bocaux, s)>1+AlgoGlouton(k, bocaux, s-bocaux.get(j))) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	public double ProbaCompatible(int k) {
+		Random r=new Random();
+		int oui=0;
+		for(int i=0;i<10000;i++) {
+			ArrayList<Integer> tab= new ArrayList<Integer>();
+			tab.add(1);
+			for(int j=1;j<k;j++) {
+				tab.add(r.nextInt(98)+2);
+			}
+			Collections.sort(tab);
+			
+			if(TestGloutonCompatible(k, tab)) oui++;
+			
+		}
+		return (double)oui/(double)10000;
+	}
 
-	public int[] searchTime(int numAlgo, int k, ArrayList<Integer> tab, int s) {
+	public int[] resoudre(int numAlgo, int k, ArrayList<Integer> tab, int s) {
 		int[] res = new int[2];
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		long end = 0;
 		int nb = 0;
 		switch(numAlgo) {
 			case 1:
 				nb = RechercheExhaustive(k, tab, s);
-				end = System.currentTimeMillis();
+				end = System.nanoTime();
 				break;
 			case 2:
-				nb = AlgoProgDyn(k, tab, s);
-				end = System.currentTimeMillis();
+				nb = AlgoProgDynRec(k, tab, s);
+				end = System.nanoTime();
 				break;
 			case 3:
+				nb = AlgoProgDynIter(k, tab, s);
+				end = System.nanoTime();
+				break;
+			case 4:
 				nb = AlgoGlouton(k, tab, s);
-				end = System.currentTimeMillis();
+				end = System.nanoTime();
 				break;
 		}
 		res[0] = nb;
-		res[1] = (int) (end - start);
+		res[1] = (int) (end - start)/100;
 		return res;
 	}
 
