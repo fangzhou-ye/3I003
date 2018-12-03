@@ -147,7 +147,7 @@ public class Test {
 		int nb_test = 20;
 		int d;
 		for(d=2; d<=4; d++) {
-			int s = 20000;
+			int s = 500000;
 			gene_KT_Sample(nb_test, d, s);
 			output_KT_Data(nb_test, d);
 			gene_ST_Sample(kk, dd, interval);

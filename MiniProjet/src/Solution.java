@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import javafx.scene.control.Tab;
-
 public class Solution {
 	
 	private int s;
@@ -141,7 +139,7 @@ public class Solution {
 		}
 		return min(left, right);
 	}
-	
+	/*
 	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
 		ArrayList<Integer> opt = new ArrayList<Integer>();
 		System.out.println(Arrays.toString(tab.toArray()));
@@ -165,6 +163,25 @@ public class Solution {
 			opt.add(a, min);
 		}
 		return opt.get(s);
+	}
+	*/
+	
+	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
+		int[][] M = new int[k][s+1];
+		for(int i=0; i<k; i++) {
+			for(int j=0; j<=s; j++) {
+				if(j == 0) M[i][j] = 0;
+				if(i == 0) M[i][j] = j/tab.get(i);
+				else {
+					if(j >= tab.get(i)) {
+						M[i][j] = Math.min(M[i-1][j], M[i][j-tab.get(i)] + 1);
+					}else {
+						M[i][j] = M[i-1][j];
+					}
+				}
+			}
+		}
+		return M[k-1][s];
 	}
 	
 	// supposons que tab est trié par ordre croissant selon le poids
