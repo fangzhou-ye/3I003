@@ -19,11 +19,20 @@ public class Solution {
 	private int d;
 	private Map<Integer, Integer> V;
 	private ArrayList<Integer> bocaux;
+	private int[][] M;
 	// algo 2
 	private LinkedHashMap<Integer[], Integer> temp;
 	
 	public Solution(int numFichier, String folder) throws IOException{
 		init(numFichier, folder);
+	}
+	
+	public int[][] getM(){
+		return M;
+	}
+	
+	public Map<Integer, Integer> getV(){
+		return V;
 	}
 	
 	public void print_temp() {
@@ -69,19 +78,19 @@ public class Solution {
 			in = new BufferedReader(new FileReader(fichier));
 			s = Integer.parseInt(in.readLine());
 			k = Integer.parseInt(in.readLine());
-			d = Integer.parseInt(in.readLine());
+			// d = Integer.parseInt(in.readLine());
 			V = new LinkedHashMap<Integer, Integer>(k);
 			temp = new LinkedHashMap<Integer[], Integer>();
-			init_bocaux(k, d);
+			// init_bocaux(k, d);
 			// lectrue de fichier des valeurs bocaux
-			/*
+			
 			bocaux = new ArrayList<Integer>();
 			String[] arr = in.readLine().split(" ");
 			for(String str : arr) {
 				V.put(Integer.parseInt(str), 0);
 				bocaux.add(Integer.parseInt(str));
 			}
-			*/
+			
 		} catch(FileNotFoundException e) {
 			System.out.println("fichier texte pas trouve");
 		}
@@ -167,7 +176,7 @@ public class Solution {
 	*/
 	
 	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
-		int[][] M = new int[k][s+1];
+		M = new int[k][s+1];
 		for(int i=0; i<k; i++) {
 			for(int j=0; j<=s; j++) {
 				if(j == 0) M[i][j] = 0;
@@ -227,6 +236,22 @@ public class Solution {
 		}
 		return (double)oui/(double)10000;
 	}
+	
+	public void optimalProgDyn(int[][] M,ArrayList<Integer> tab){
+        int k=M.length-1;
+        int s=M[0].length-1;
+        while(k>=1 &&s>0) {
+            if(M[k-1][s]>M[k][s]) {
+                V.put(tab.get(k), V.get(tab.get(k))+1);
+                s=s-tab.get(k);
+            }
+            else {
+                k=k-1;
+            }
+        }
+        if(s>0)
+        V.put(1, V.get(tab.get(k))+s);
+    }
 
 	public int[] resoudre(int numAlgo, int k, ArrayList<Integer> tab, int s) {
 		int[] res = new int[2];

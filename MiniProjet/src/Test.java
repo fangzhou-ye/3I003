@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Set;
 
 public class Test {
 	
@@ -81,7 +82,14 @@ public class Test {
 		}
 		writer.close();
 	}
-	
+	public static void proba(Solution m) throws IOException{
+		BufferedWriter writer = new BufferedWriter(new FileWriter("proba.text"));
+		for(int i=3;i<10;i++) {
+			writer.write(i+" "+m.ProbaCompatible(i)+"\n");
+			
+		}
+		writer.close();
+	}
 	public static void exercice14(Solution m) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter("abc.text"));
 			Random r=new Random();
@@ -121,10 +129,10 @@ public class Test {
 					non_compatible++;
 					ecart_moyen=(double)somme/(double)((f-1)*pmax+1);
 					ecart_moyen_somme+=ecart_moyen;
-					writer.write("ecart_max : "+ecart_max+ " ecart_moyen: "+ecart_moyen+ "\n");
+					writer.write(i+ " "+ecart_max + " " + ecart_moyen+ "\n");
 				}
 				/*System.out.println("glouton: "+glouton +" optimal: " +optimal);*/
-				
+				else writer.write(i+ " "+0 + " " + 0+ "\n");
 			}
 			
 			ecart_moyen_moyen=ecart_moyen_somme/(double)non_compatible;
@@ -135,24 +143,24 @@ public class Test {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// Solution s = new Solution(0, "Test");
-		/*for(int i=3;i<10;i++) {
-			System.out.println(s.ProbaCompatible(i));
-		}*/
-		// exercice14(s);
+		Solution ss = new Solution(1, "Test");
+		//proba(ss);
+		//Solution s = new Solution();
 		
-		int kk = 20;
+		 //exercice14(s);
+		
+		/*int kk = 6;
 		int dd = 3;
-		int interval = 1000;
+		int interval = 20000;
 		int nb_test = 20;
 		int d;
 		for(d=2; d<=4; d++) {
-			int s = 500000;
+			int s = 50000;
 			gene_KT_Sample(nb_test, d, s);
 			output_KT_Data(nb_test, d);
 			gene_ST_Sample(kk, dd, interval);
 			output_ST_Data(nb_test, d);
-		}
+		}*/
 		
 		// Test algo dynamique iteratif
 		/*
@@ -172,6 +180,23 @@ public class Test {
 		System.out.println(sol);
 		System.out.println("nb: " + nb + " temps: " + temps + "nano-s");
 		*/
+		
+		// exercice 5b
+		 Solution sol = new Solution(1, "Test");
+	     int[] res = sol.resoudre(3, sol.getK(), sol.getBocaux(), sol.getS());
+	     sol.optimalProgDyn(sol.getM(), sol.getBocaux());
+	     String s="[ ";
+	     Set key=sol.getV().keySet();
+	     for(Integer i: sol.getV().keySet()) {
+	          s+=i+ ":"+sol.getV().get(i)+" ";
+	     }
+	     s+=" ]";
+	     System.out.println(s);
+	     int nb = res[0];
+	     int temps = res[1];
+	     System.out.println(sol);
+	     System.out.println("nb: " + nb + " temps: " + temps + " nano-s");
+	     System.out.println(sol);
 	}
 
 }
