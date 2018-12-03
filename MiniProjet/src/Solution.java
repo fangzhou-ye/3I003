@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javafx.scene.control.Tab;
+
 public class Solution {
 	
 	private int s;
@@ -64,23 +66,24 @@ public class Solution {
 		BufferedReader in = null;
 		try {
 			String filePath = new File("").getAbsolutePath() + "/src/" + folder + "/init" + numFichier +".txt";
+			System.out.println(filePath);
 			File fichier = new File(filePath);
 			in = new BufferedReader(new FileReader(fichier));
 			s = Integer.parseInt(in.readLine());
 			k = Integer.parseInt(in.readLine());
-			//d = Integer.parseInt(in.readLine());
+			d = Integer.parseInt(in.readLine());
 			V = new LinkedHashMap<Integer, Integer>(k);
 			temp = new LinkedHashMap<Integer[], Integer>();
-			//init_bocaux(k, d);
+			init_bocaux(k, d);
 			// lectrue de fichier des valeurs bocaux
-			
+			/*
 			bocaux = new ArrayList<Integer>();
 			String[] arr = in.readLine().split(" ");
 			for(String str : arr) {
 				V.put(Integer.parseInt(str), 0);
 				bocaux.add(Integer.parseInt(str));
 			}
-			
+			*/
 		} catch(FileNotFoundException e) {
 			System.out.println("fichier texte pas trouve");
 		}
@@ -141,6 +144,7 @@ public class Solution {
 	
 	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
 		ArrayList<Integer> opt = new ArrayList<Integer>();
+		System.out.println(Arrays.toString(tab.toArray()));
 		opt.add(0, 0);
 		for(int a=1; a<=s; a++) {
 			int j = k-1;
@@ -189,18 +193,19 @@ public class Solution {
 		return true;
 	}
 	
-	public double ProbaCompatible(int k) {
+	public double ProbaCompatible(int k1) {
 		Random r=new Random();
 		int oui=0;
 		for(int i=0;i<10000;i++) {
-			ArrayList<Integer> tab= new ArrayList<Integer>();
-			tab.add(1);
-			for(int j=1;j<k;j++) {
-				tab.add(r.nextInt(98)+2);
+			ArrayList<Integer> tab1= new ArrayList<Integer>();
+			tab1.add(1);
+			while(tab1.size()<k1) {
+				int a=r.nextInt(98)+2;
+				if(!tab1.contains(a))
+					tab1.add(a);
 			}
-			Collections.sort(tab);
-			
-			if(TestGloutonCompatible(k, tab)) oui++;
+			Collections.sort(tab1);
+			if(TestGloutonCompatible(k1, tab1)) oui++;
 			
 		}
 		return (double)oui/(double)10000;

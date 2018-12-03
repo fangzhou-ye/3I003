@@ -1,0 +1,244 @@
+\documentclass{article}
+\usepackage[vlined, french, onelanguage]{algorithm2e}
+\usepackage[left=3 cm, right=3 cm,top=3cm,  bottom=3cm]{geometry}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\title{Mini-Projet d'Algorithme
+ \\Confiture}
+\author{Fangzhou YE, Shihao ZHANG, Qijia HUANG}
+\date{\today}
+\renewcommand{\contentsname}{Table des Matières}
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\listofalgorithms
+\newpage
+\section{Algorithme I: Recherche exhaustive}
+\paragraph{Question 1}
+$P(n)$ \textbf{RechercheExhaustive} ($k, V, n$) retourne bien le nombre minimal de bocaux utilisés pour la quantité n et elle se termine.
+
+\textbf{Base:} $P(0)$
+\textbf{RechercheExhaustive}($k, V, 0$)=0 donc $P(0)$ vraie. Donc elle est valide et se termine.
+
+\textbf{Induction:} 
+Supposons que $\forall n \in [0,S]$, $P(n)$ vraie. Montrons que $P(n+1)$.
+
+Dans \textbf{RechercheExhaustive}($k, V, n+1$), NbCount est initialisé par $n+1$, ce qui correspond à l'utilisation de $n+1$ bocaux de 1 $dg$.
+
+Dans la boucle \'for\'. $\forall i \in [1,k]$, $x$=\textbf{RechercheExhaustive}$(k, V, n+1-V[i])$. x est le nombre minimal de bocaux utilisés pour remplir $n+1-V[i]$  $dg$ de confitures. Comme $n+1-V[i] \leq n$. D'après \textbf{HR}, pour $\forall i \in [1,k], $ \textbf{RechercheExhaustive}$(k, V, n+1-V[i])$ sont valides et se terminent.
+Concernant la solution pour la quantité $n+1$ $dg$, on obtient le résultat $x+1$ en rajoutant un bocal de capacité $V[i]$ à la base de la solution pour la quantité $n+1-V[i]$. Puis, on compare $x+1$ avec $NbCount$ (ce qui est la meilleure soltion pour la quantité $n+1$ $dg$ jusqu'à présent) et on garde ce qui plus petit dans la variable $NbCount$. On répète cette opération pour toute taille de bocal disponible. Donc à la fin de boucle.\textbf{RechercheExhaustive}$(k, V, n+1)$ correspond au nombre minimal de boucaux pour la quantité n+1.  La boucle \'for\' a un nombre fini itérations, et dans chaque itération \textbf{RechercheExhaustive$(k, V, n+1-V[i])$} se termine d'après \textbf{HR}. La fonction est valide et se termine. Donc $P(n+1)$ est vraie.
+
+\textbf{Conclusion: }
+La fonction \textbf{RechercheExhaustive$(k, V, S)$} est valide et se termine.
+
+\paragraph{Question 2}
+\begin{enumerate}[a)]
+\item \begin{align*}
+ a(s)=
+\begin{cases}
+0,&\text{si } s=0\\
+2,&\text{si } s=1\\
+a(s-1)+a(s-2)+2,&\text{si } s\geq 2
+\end{cases}
+\end{align*}
+\item 
+\begin{enumerate}[i. ]
+\item Montrons que $b(s) \leq a(s)$ par récurrence.
+
+$P(n):  a(s) - b(s) \geq 0 $.
+
+
+\textbf{Base: } 
+\begin{itemize}
+\item $P(0): a(0) - b(0) = 0 - 0 = 0$. Elle est vraie. 
+\item $P(1): a(1) - b(1) = 2 - 2 = 0$. Elle est vraie.
+\end{itemize}
+\textbf{Induction: } 
+
+Supposons $\forall n \in [0,S]$, $P(n)$ vraie, montrons $P(n+1)$ vraie.
+\begin{align*}
+a(s+1) - b(s+1) &= a(s) + a(s-1) + 2 - (b(s-1) + b(s-1) +2)
+			\\&= a(s) - b(s-1) + a(s-1) - b(S-1)
+			\\&\geq a(s) - b(s) + a(s-1) - b(S-1)
+\end{align*}
+On a $a(s) - b(s) \geq 0$ et $a(s-1) - b(s-1) \geq 0$ d'après \textbf{HR}. Donc $a(s+1) - b(s+1) \geq 0$. $P(n+1)$ est vraie.
+
+\textbf{Conclusion: }$a(s) \geq b(s)$ pour tout entier $S\geq0$. 
+\item Montrons que $c(s) \geq a(s)$ par récurrence.
+
+$P(n):  c(s) - a(s) \geq 0 $.
+
+\textbf{Base: } 
+\begin{itemize}
+\item $P(0): c(0) - a(0) = 0 - 0 = 0$. Elle est vraie. 
+\item $P(1): c(1) - a(1) = 2 - 2 = 0$. Elle est vraie.
+\end{itemize}
+\textbf{Induction: } 
+
+Supposons $\forall n \in [0,S]$, $P(n)$ vraie, montrons $P(n+1)$ vraie.
+\begin{align*}
+c(s+1) - a(s+1) &= c(s) + c(s) + 2 - (a(s) + a(s-1) +2)
+			\\&= c(s) - a(s) + c(s) - a(s-1)
+			\\&\geq c(s) - a(s) + c(s) - a(s)
+\end{align*}
+On a $c(s) - a(s) \geq 0$ d'après \textbf{HR}. Donc $c(s+1) - a(s+1) \geq 0$. $P(n+1)$ est vraie.
+
+\textbf{Conclusion: }$b(s) \leq a(s) \leq c(s)$ pour tout entier $s\geq0$.
+\end{enumerate}
+\item On suppos $P(s): c(s)=(2^s-1) \times 2$
+
+\textbf{Base: } 
+\begin{itemize}
+\item $c(0)=(2^0-1) \times 2 = 0$. Elle est vraie.
+\item $c(1)=(2^1-1) \times 2 = 2$. Elle est vraie.
+\end{itemize}
+\textbf{Induction: } 
+
+Supposons $P(s)$ vraie, montrons $P(s+1)$ vraie.
+\begin{align*}
+c(s+1) &= 2 \times c(s)+ 2 
+			\\&= 2 \times (2^s - 1) \times 2 + 2
+			\\&=(2^(s+1) - 2) \times 2 + 2\\&=(2^(s+1)-1) \times 2
+\end{align*}
+
+\textbf{Conclusion}: $c(s)=(2^s-1) \times 2$
+\item $P(s): b(s)=c(\frac{s}{2})$. 
+
+\textbf{Base}: 
+\begin{itemize}
+\item $P(0): b(0)=c(0)=0$. Elle est vraie.
+\item $P(1): b(1)=c(\frac{1}{2})=0$. Elle est vraie.
+\end{itemize}
+\textbf{Induction}: 
+
+Suppons $\forall s \geq 0, P(s)$ vraie, montrons $P(s+1)$ vraie.
+\begin{align*}
+b(s+1) &= 2 \times b(s-1) + 2\\
+c(\frac{s+1}{2}) &= 2 \times c(\frac{s+1}{2} - 1) + 2\\&=2 \times c(\frac{s+1}{2}) +2\\\text{D'après \textbf {HR},} b(s-1)&=c(\frac{s-1}{2})\\
+\text{Donc }b(s+1) &=c(\frac{s+1}{2})
+\end{align*}
+\textbf{Conclusion: }$P(s+1)$ vraie. Donc $b(s+1) = c(\frac{s+1}{2})$
+\item $b(s) =(2^{\frac{s}{2}}-1) \times 2.$
+
+D'après les questions précédentes, on a $a(s)$ correspond au nombre d'après récursif réalisé par \textbf{RechercheExhaustive}($2,\frac12,s$), et on a $b(s) \leq a(s) \leq c(s)$. Donc $(2^{\frac{s}{2}}-1) \times 2 \leq a(s) \leq (2^s-1) \times 2$. Donc on généralise cette conclusion. Donc \textbf{RechercheExhaustive}($k, V, s$) où $k$ est le nombre de bocas dispositifs. La complexité est en $O(k^5)$
+\end{enumerate}
+\section{Algorithme II:}
+\paragraph{Question 3}
+\begin{enumerate}[a)]
+\item $m(s) = m(s,k)$
+\item $P(s)  \langle \forall i \in \{1,\dots,k\}, m(s,i)=\min\{(s,i-1), m(s-v[i],i) + 1\} \rangle$
+
+\textbf{Base: }
+\begin{align*}
+P(0): m(0,i) &= \min(m(0,i-1), m(0-v[i], i)+1)\\&=\min(0, +\infty)\\&=0
+\end{align*}
+
+\textbf{Induction: }Suppons $\forall n \in \{0,\dots,s\}, P(n) $vraie, montrons $P(n+1)$ vraie.
+\begin{itemize}
+\item \underline{Cas 1:} $0<s+1<v[i]$: Le problème revient à déterminer une solution pour remplir $s$ en utilisant que des bocal de $v[1] \dots v[i-1]$. Donc, $m(s+1, i)= m(s+1, i-1)$.
+
+Soit $l = \max (h \in \{1,\dots,i-1\}, \text{tel que }s+1-v(j)>0)$,
+
+Alors $m(s+1, i-1)= m(s+1-v[i], i) + 1$. Comme $s+1-v[j] \leq s$. D'après \textbf{HR}, elle est vraie.
+
+Donc $m(s+1,i)= m(s+1, i-1) $ est vraie pour $s+1 < v[i]$.
+\item \underline{Cas 2:} $s+1 \geq v[i], m(s+1,i)= m(s+1-v[i], i) + 1$, comme $s+1-v[j] \leq s$. D'après \textbf{HR}, elle est vraie.
+
+Donc $m(s+1,i)= m(s+1-v[i], i) + 1$ pour $s+1 \geq v[i]$. 
+\end{itemize}
+\textbf{Conclusion: } En combinant cas 1 et cas 2, on a 
+\begin{align*}
+ m(s,i)=
+\begin{cases}
+0,&\text{si } s=0\\
+\min(m(s,i-1),m(s-v[i],i)+1)&\text{sinon.} \\
+\end{cases}
+\end{align*} 
+\end{enumerate}
+\paragraph{Question 4}
+\begin{enumerate}[a)]
+\item En ordre de postfixe d'arbre récursif.
+\end{enumerate}
+
+\begin{algorithm}[!h]
+\SetAlgoLined\TitleOfAlgo{AlgoProgDynIter}
+\KwData{k:entier, V:tableau de k entiers, s:entier}
+ \KwResult{entier}
+        opt : tableau de $s+1$ entiers\;
+        a, j, min, left, right : entier\;
+        Opt[0] = 0\;
+        \For{$a = 1 \to s$}
+                {{$J = k$\;}
+                \While{V[j] $>$ a}{J = j - 1\;}
+                Left = 1\;
+                Right = a - 1\;
+                \eIf{a\%V[j] == 0} 
+                        {Min = a/V[j]}
+                     {Min = a}
+              
+                \While{left $\leq$ right}
+                      {\If{min $>$ opt[right] + opt[left]}{Min = opt[right] + opt[left]\;}
+                        Left = left + 1\;
+                        Right = right + 1\;}          
+                Opt[a] = min\;}
+        Retourner opt[s+1]\;
+        \caption{\textbf{Question 4 b)}}
+\end{algorithm}
+
+\newpage
+\section{Algorithme III:}
+
+\begin{algorithm}[!h]
+\SetAlgoLined\TitleOfAlgo{AlgoGlouton}
+  \KwData{k: entier, V: tab de k entiers, S: entier, res:entiers}
+  nb:=entiers\;
+  \eIf{k==1}{
+      Retourner S\;
+    }{
+      nb=s/V[k]\;
+      res=s\%v[k]\;
+      Retourner \textbf{AlgoGlouton}(k-1, tab, res) $+$ nb 
+    }
+    \caption{\textbf{Question 7}}
+ \end{algorithm}
+  
+\paragraph{Question 8}
+On a exemple que pour $k=5, tab = [1, 10, 20, 50, 70]$. Pour remplacer $s=100$. D'après \textbf{AlgoGlouton}, on a résultat de 3 correspondant le bocal de [10, 20, 70]. Cependant, la solution de [50, 50] est plus optimal au niveau de nombre de bocaux.
+\paragraph{Question 9}
+\begin{enumerate}[a)]
+\item Montrer par l'absurde. Soit il n'existe pas un plus grand indice $j$ tel que $o_j < k_j$, c'est-à-dire, pour tout $j \in \{1, \dots, k\}, o_j > k_j$. Donc $\sum_{i=1}^{k}o_i > \sum_{i=1}^{k}g_i$ qui contredit que $o$ est une solution optimale.
+\end{enumerate}
+\paragraph{Question 10}
+$k=2$ donc $v[1]=1=d^0, v =[2]=d=d^1$.
+
+C'est bien un système Expo qui one bien glouton-compatible d'après la Question 9.
+\paragraph{Question 11}
+Pour la première boucle 
+\begin{align*}
+v[3] &>3\\v[k-1] &< s-1\\v[k] &<s
+\end{align*}
+
+Donc première boucle exécute au plus $2s \times 7$ fois.
+
+Dans la deuxième boucle, la boucle exécute $k$ fois.
+
+\textbf{AlgoGloutun} $(s)$ est en $O(s)$.
+
+Donc $(2s-7) \times k \times 2O(s)$ dont $k$ est une constante.
+
+Donc $T(n) = O(n^2)$.
+\paragraph{Question 12}
+
+\begin{figure}[!b]
+   \center\includegraphics[width=11.13cm, height=8.35cm]{1}
+   \center yefangzhou chajin
+\end{figure}
+\newpage
+\begin{figure}[!h]
+ \center\includegraphics[width=11.13cm, height=8.35cm]{2}
+   \center yefangzhou chajin
+\end{figure}
+\end{document}
