@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -20,8 +18,12 @@ public class Solution {
 	private Map<Integer, Integer> V;
 	private ArrayList<Integer> bocaux;
 	private int[][] M;
-	// algo 2
+	// utilisé pour progDyn de façon recursif, ce qui est le moins optimal, tant pire :(
 	private LinkedHashMap<Integer[], Integer> temp;
+	
+	public Solution() {
+		V = new LinkedHashMap<Integer, Integer>(k);
+	}
 	
 	public Solution(int numFichier, String folder) throws IOException{
 		init(numFichier, folder);
@@ -41,6 +43,14 @@ public class Solution {
 		}
 	}
 	
+	public String print_V() {
+		String str = "[ ";
+		for(Integer bocal : V.keySet()) {
+			str += bocal + ":" + V.get(bocal) + " ";
+		}
+		return str + "]";
+	}
+	
 	public String print_bocaux() {
 		String s = "[ ";
 		for(Integer b : bocaux) {
@@ -54,7 +64,10 @@ public class Solution {
 		String s = "";
 		s += "s:" + this.s + "\n";
 		s += "k:" + this.k + "\n";
-		return s + print_bocaux();
+		s += "system bocaux: " + print_bocaux();
+		s += "\n";
+		s += "solution: " + print_V();
+		return s;
 	}
 	
 	public int getS() {
@@ -69,40 +82,60 @@ public class Solution {
 		return bocaux;
 	}
 	
+	public static boolean isNum(String str) {
+	    boolean res = true;
+	    try {
+	        Double.parseDouble(str);
+	    }catch (NumberFormatException e) {
+	        res = false;
+	    }
+	    return res;
+	}
+	
+	
+	/***
+	 * initialiser le system bocaux, k, d, s par lecture de fichier
+	 * @param numFichier
+	 * @param folder
+	 * @throws IOException
+	 */
 	public void init(int numFichier, String folder) throws IOException {
 		BufferedReader in = null;
 		try {
 			String filePath = new File("").getAbsolutePath() + "/src/" + folder + "/init" + numFichier +".txt";
-			System.out.println(filePath);
 			File fichier = new File(filePath);
 			in = new BufferedReader(new FileReader(fichier));
 			s = Integer.parseInt(in.readLine());
 			k = Integer.parseInt(in.readLine());
-			// d = Integer.parseInt(in.readLine());
+			bocaux = new ArrayList<Integer>();
+			String line3 = in.readLine();
 			V = new LinkedHashMap<Integer, Integer>(k);
 			temp = new LinkedHashMap<Integer[], Integer>();
-			// init_bocaux(k, d);
-			// lectrue de fichier des valeurs bocaux
-			
-			bocaux = new ArrayList<Integer>();
-			String[] arr = in.readLine().split(" ");
-			for(String str : arr) {
-				V.put(Integer.parseInt(str), 0);
-				bocaux.add(Integer.parseInt(str));
+			if(Solution.isNum(line3)) {
+				d = Integer.parseInt(line3);
+				for(int i=0; i<k; i++) {
+					V.put((int)Math.pow(d, i), 0);
+					bocaux.add((int)Math.pow(d, i));
+				}
+			}else {
+				String[] arr = line3.split(" ");
+				for(String str : arr) {
+					V.put(Integer.parseInt(str), 0);
+					bocaux.add(Integer.parseInt(str));
+				}
 			}
-			
 		} catch(FileNotFoundException e) {
-			System.out.println("fichier texte pas trouve");
+			System.out.println("fichier init" + numFichier + ".txt pas trouve");
 		}
 	}
 	
-	public void init_bocaux(int k, int d) {
-		bocaux= new ArrayList<Integer>();
-		for(int i=0; i<k; i++) {
-			bocaux.add((int)Math.pow(d, i));
-		}
-	}
-	
+	/***
+	 * Algorithme de recherche exhaustive
+	 * @param k : nombre de bocal disponible
+	 * @param tab : system de bocaux
+	 * @param s : poids de confiture
+	 * @return
+	 */
 	public int RechercheExhaustive(int k, ArrayList<Integer> tab, int s) {
 		int nbCount = 0, x;
 		if(s<0) return Integer.MAX_VALUE - 1;
@@ -123,6 +156,13 @@ public class Solution {
 		return a;
 	}
 	
+	/***
+	 * Algorithme de programmation dynamique de façon récursive
+	 * @param k : nombre de bocal disponible
+	 * @param tab : system de bocaux
+	 * @param s : poids de confiture
+	 * @return nombre minimum de bocal
+	 */
 	public int AlgoProgDynRec(int k, ArrayList<Integer> tab, int s) {
 		if(s == 0) return 0;
 		if(s<0) return Integer.MAX_VALUE-1;//ne pas deborder la limite de integer;
@@ -148,7 +188,15 @@ public class Solution {
 		}
 		return min(left, right);
 	}
-	/*
+	
+	/***
+	 * Algorithme de programmation dynamique de façon itérative
+	 * teste toutes les combinaisons possibles
+	 * @param k : nombre de bocal disponible
+	 * @param tab : system de bocaux
+	 * @param s : poids de confiture
+	 * @return nombre minimum de bocal
+	 */
 	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
 		ArrayList<Integer> opt = new ArrayList<Integer>();
 		System.out.println(Arrays.toString(tab.toArray()));
@@ -173,9 +221,16 @@ public class Solution {
 		}
 		return opt.get(s);
 	}
-	*/
 	
-	public int AlgoProgDynIter(int k, ArrayList<Integer> tab, int s) {
+	/***
+	 * Algorithme de programmation dynamique de façon itérative plus optimal
+	 * teste que m(s, i-1) et m(s-V[i]) + 1
+	 * @param k : nombre de bocal disponible
+	 * @param tab : system de bocaux
+	 * @param s : poids de confiture
+	 * @return nombre minimum de bocal
+	 */
+	public int AlgoProgDynIterBis(int k, ArrayList<Integer> tab, int s) {
 		M = new int[k][s+1];
 		for(int i=0; i<k; i++) {
 			for(int j=0; j<=s; j++) {
@@ -193,7 +248,13 @@ public class Solution {
 		return M[k-1][s];
 	}
 	
-	// supposons que tab est trié par ordre croissant selon le poids
+	/***
+	 * Algorithme glouton
+	 * @param k : nombre de bocal disponible
+	 * @param tab : system de bocaux
+	 * @param s : poids de confiture
+	 * @return nombre minimum de bocal
+	 */
 	public int AlgoGlouton(int k, ArrayList<Integer> tab, int s) {
 		if(k==1) {
 			V.put(1, s);
@@ -206,6 +267,12 @@ public class Solution {
 		return nb;
 	}
 	
+	/**
+	 * tester si un system bocal est glouton compatible
+	 * @param k : nombre de bocal disponible
+	 * @param bocaux : system de bocaux
+	 * @return si un system bocal est glouton compatible
+	 */
 	public boolean TestGloutonCompatible(int k, ArrayList<Integer> bocaux) {
 		if(k >= 3) {
 			for(int s = bocaux.get(2)+2; s<=bocaux.get(k-2)+bocaux.get(k-1)-1; s++) {
@@ -219,6 +286,11 @@ public class Solution {
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @param k1 : nombre de bocal disponible
+	 * @return la probalilité d'être glouton compatible
+	 */
 	public double ProbaCompatible(int k1) {
 		Random r=new Random();
 		int oui=0;
@@ -237,6 +309,11 @@ public class Solution {
 		return (double)oui/(double)10000;
 	}
 	
+	/**
+	 * trouver la solution exacte par AlgoProgDynamiqueBis
+	 * @param M : la matrice de taille k*s
+	 * @param tab : system de bocaux
+	 */
 	public void optimalProgDyn(int[][] M,ArrayList<Integer> tab){
         int k=M.length-1;
         int s=M[0].length-1;
@@ -253,6 +330,14 @@ public class Solution {
         V.put(1, V.get(tab.get(k))+s);
     }
 
+	/**
+	 * tester le temps d'exécution de chaque algo
+	 * @param numAlgo : numero d'algo à tester
+	 * @param k : nombre de bocal disponible
+	 * @param tab : system de bocaux
+	 * @param s : poids de confiture
+	 * @return tableau à 2 dimension. le premier étant le nombre min, le deuxième étant le temps d'exécution de algo choisi
+	 */
 	public int[] resoudre(int numAlgo, int k, ArrayList<Integer> tab, int s) {
 		int[] res = new int[2];
 		long start = System.nanoTime();
@@ -272,6 +357,10 @@ public class Solution {
 				end = System.nanoTime();
 				break;
 			case 4:
+				nb = AlgoProgDynIterBis(k, tab, s);
+				end = System.nanoTime();
+				break;
+			case 5:
 				nb = AlgoGlouton(k, tab, s);
 				end = System.nanoTime();
 				break;

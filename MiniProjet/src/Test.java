@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import java.util.Set;
 
 public class Test {
 	
@@ -37,8 +36,8 @@ public class Test {
 	
 	public static int[] test_KT(int numFichier, String folder) throws IOException {
 		Solution s = new Solution(numFichier, folder);
-		int[] res1 = s.resoudre(3, s.getK(), s.getBocaux(), s.getS());
-		int[] res2 = s.resoudre(4, s.getK(), s.getBocaux(), s.getS());
+		int[] res1 = s.resoudre(4, s.getK(), s.getBocaux(), s.getS());
+		int[] res2 = s.resoudre(5, s.getK(), s.getBocaux(), s.getS());
 		int[] r = new int[3];
 		r[0] = s.getK();
 		r[1] = res1[1];
@@ -50,8 +49,8 @@ public class Test {
 	public static int[] test_ST(int numFichier, String folder) throws IOException {
 		Solution s = new Solution(numFichier, folder);
 		System.out.println(s);
-		int[] res1 = s.resoudre(3, s.getK(), s.getBocaux(), s.getS());
-		int[] res2 = s.resoudre(4, s.getK(), s.getBocaux(), s.getS());
+		int[] res1 = s.resoudre(4, s.getK(), s.getBocaux(), s.getS());
+		int[] res2 = s.resoudre(5, s.getK(), s.getBocaux(), s.getS());
 		int[] r = new int[3];
 		r[0] = s.getS();
 		r[1] = res1[1];
@@ -82,6 +81,12 @@ public class Test {
 		}
 		writer.close();
 	}
+	
+	/**
+	 * tester de k 3 à 9, la probalibité d'être glouton compatible dans chaque system, ecrit dans le fichier.
+	 * @param m
+	 * @throws IOException
+	 */
 	public static void proba(Solution m) throws IOException{
 		BufferedWriter writer = new BufferedWriter(new FileWriter("proba.text"));
 		for(int i=3;i<10;i++) {
@@ -90,6 +95,12 @@ public class Test {
 		}
 		writer.close();
 	}
+	
+	/**
+	 * Ce qu'il fallait faire dans exo14 XD
+	 * @param m
+	 * @throws IOException
+	 */
 	public static void exercice14(Solution m) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter("abc.text"));
 			Random r=new Random();
@@ -115,13 +126,12 @@ public class Test {
 				}
 				Collections.sort(tab);
 				int pmax=tab.get(k-1);
-				
 				if(!m.TestGloutonCompatible(k, tab)){
 					somme=0;
 					ecart_max=Integer.MIN_VALUE;
 					for(int j=pmax;j<10*pmax;j++) {
 						glouton=m.AlgoGlouton(k, tab, j);
-						optimal=m.AlgoProgDynIter(k, tab, j);
+						optimal=m.AlgoProgDynIterBis(k, tab, j);
 						int ecart=glouton-optimal;
 						ecart_max= (ecart_max>ecart)? ecart_max:ecart;
 						somme+=ecart;
@@ -143,13 +153,49 @@ public class Test {
 	}
 
 	public static void main(String[] args) throws IOException {
+		
+		// test RechercheExhaustive qui prend tres longtemps, il ne permet pas de trouver la solution exacte
+		/*
+		Solution sol = new Solution(1, "Test");
+		int[] res = sol.resoudre(1, sol.getK(), sol.getBocaux(), sol.getS());
+		System.out.println("nb: " + res[0] + " time: " + res[1]);
+		System.out.println(sol);
+		*/
+		
+		// test AlgoProgDynBis
+		/*
+		Solution sol = new Solution(0, "Test");
+		int[] res = sol.resoudre(4, sol.getK(), sol.getBocaux(), sol.getS());
+		sol.optimalProgDyn(sol.getM(), sol.getBocaux());
+		System.out.println("nb: " + res[0] + " time: " + res[1]);
+		System.out.println(sol);
+		*/
+		
+		// test AlgoGlouton
+		/*
+		Solution sol = new Solution(0, "Test");
+		int[] res = sol.resoudre(5, sol.getK(), sol.getBocaux(), sol.getS());
+		System.out.println("nb: " + res[0] + " time: " + res[1]);
+		System.out.println(sol);
+		*/
+		
+		// générer des données de teste de glouton compatible, ecrit des resultat dans un texte
+		/*
 		Solution ss = new Solution(1, "Test");
-		//proba(ss);
-		//Solution s = new Solution();
-		
-		 //exercice14(s);
-		
-		/*int kk = 6;
+		proba(ss);
+		*/
+				
+		// tester la probalilité de glouton compatible
+		/*
+		Solution s = new Solution();
+		exercice14(s);
+		*/
+				
+		// générer des données de teste, permettant de tracer la courbe par Octave.
+		// Il faut avoir la repertoire "KT" et "ST" dans le repertoire "src" qui stockent
+		// les données de teste.
+		/*
+		int kk = 6;
 		int dd = 3;
 		int interval = 20000;
 		int nb_test = 20;
@@ -160,43 +206,9 @@ public class Test {
 			output_KT_Data(nb_test, d);
 			gene_ST_Sample(kk, dd, interval);
 			output_ST_Data(nb_test, d);
-		}*/
-		
-		// Test algo dynamique iteratif
-		/*
-		Solution sol = new Solution(0, "Test");
-		int[] res = sol.resoudre(4, sol.getK(), sol.getBocaux(), sol.getS());
-		int nb = res[0];
-		int temps = res[1];
-		System.out.println(sol);
-		System.out.println("nb: " + nb + " temps: " + temps + "nano-s");
+		}
 		*/
 		
-		/*
-		Solution sol = new Solution(0, "Test");
-		int[] res = sol.resoudre(3, sol.getK(), sol.getBocaux(), sol.getS());
-		int nb = res[0];
-		int temps = res[1];
-		System.out.println(sol);
-		System.out.println("nb: " + nb + " temps: " + temps + "nano-s");
-		*/
-		
-		// exercice 5b
-		 Solution sol = new Solution(1, "Test");
-	     int[] res = sol.resoudre(3, sol.getK(), sol.getBocaux(), sol.getS());
-	     sol.optimalProgDyn(sol.getM(), sol.getBocaux());
-	     String s="[ ";
-	     Set key=sol.getV().keySet();
-	     for(Integer i: sol.getV().keySet()) {
-	          s+=i+ ":"+sol.getV().get(i)+" ";
-	     }
-	     s+=" ]";
-	     System.out.println(s);
-	     int nb = res[0];
-	     int temps = res[1];
-	     System.out.println(sol);
-	     System.out.println("nb: " + nb + " temps: " + temps + " nano-s");
-	     System.out.println(sol);
 	}
 
 }
